@@ -146,14 +146,18 @@ def process_links(txt, prefix):
     txt = re.sub(r'[^\[][0,2](attachment:.*)[^\]][0,2]', 
                  '[[' + "\\1" + ']]', txt)
     # handle explicit links inside brackets [[link]]
+    # we search for [[link]], and call a function to 
+    # convert the actual link text for each match.
+    # lambda used so we can pass prefix in.
     txt = re.sub(r'\[\[(.*?)\]\]', 
           lambda matchobj: '[[' + convert_link(matchobj, prefix) + ']]',
           txt)
-    # handle prefix for WikiWords here 
+    # handle WikiWords when prefix is enabled here 
+    # we convert to an explicit link when a prefix is involved, so
+    # the link resolves to the correct place in the sub wiki
     if prefix:
-        wikiword_re = re.compile(r'(\s)([A-Z]\w+[A-Z]+\w+)')
-        txt = wikiword_re.sub(r'\1' + prefix + '/' + r'\2', txt)
-
+        wikiword_re = re.compile(r'(\s)([A-Z][a-z]+[A-Z]+[a-z]+)')
+        txt = wikiword_re.sub(r'\1[[' + prefix + '/' + r'\2]]', txt)
     return txt
 
 def convert_link(matchobj, prefix):

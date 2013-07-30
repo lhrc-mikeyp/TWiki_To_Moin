@@ -133,8 +133,38 @@ class LinkTests(unittest.TestCase):
     def test_wikiword(self):
         # spaces around the wikiwords here are deliberate, since
         # wikiwords are defined by whitespace
-        twiki = " SimpleLink "
-        moin  = " " + self.prefix_slash + "SimpleLink "
+        twiki = " WikiWord "
+        if self.prefix:
+            moin  = " [[" + self.prefix_slash + "WikiWord]] "
+        else:
+            moin  = " WikiWord "
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
+
+    def test_wikiword_upper(self):
+        # spaces around the wikiwords here are deliberate, since
+        # wikiwords are defined by whitespace  
+        # all uppercase is not a wikiword, so expect no prefix or changes
+        twiki = " WIKIWORD "
+        moin  = " WIKIWORD "
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
+
+    def test_wikiword_underscore(self):
+        # spaces around the wikiwords here are deliberate, since
+        # wikiwords are defined by whitespace
+        # underscore is not  wikiword, so expect no prefix or changes
+        twiki = " Wiki_Word "
+        moin  = " Wiki_Word "
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
+
+    def test_wikiword_punctuation(self):
+        # spaces around the wikiwords here are deliberate, since
+        # wikiwords are defined by whitespace
+        # puctuation does not prevent a wikiword
+        twiki = " WikiWord? "
+        if self.prefix:
+            moin  = " [[" + self.prefix_slash + "WikiWord]]? "
+        else:
+            moin  = " WikiWord? "
         self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
     def test_specific(self):

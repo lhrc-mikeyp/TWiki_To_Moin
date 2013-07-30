@@ -21,7 +21,7 @@ TWiki to MoinMoin conversion
 import logging 
 from optparse import OptionParser
 import os
-from os.path import isdir, join, abspath
+from os.path import isdir, join 
 import re
 import sys
 
@@ -31,6 +31,8 @@ __version__ = '1.0'
 log = logging.getLogger('twiki_to_moin')
 log.setLevel(logging.INFO)
 console_handler = logging.StreamHandler()
+console_formatter = logging.Formatter('%(levelname)s - %(message)s')
+console_handler.setFormatter(console_formatter)
 log.addHandler(console_handler)
 
 # constants used by Moin when mapping URL's to file names
@@ -94,7 +96,7 @@ examples:
     prefix = options.prefix
 
     log.info("Running with arguments:")
-    msg = "TWiki page dir: {0) Twiki data dir: {1} Destination dir: {2}".format(
+    msg = "TWiki page dir: {0} Twiki data dir: {1} Destination dir: {2}".format(
         twiki_page_dir, twiki_data_dir, moin_page_dir)
     log.info(msg)
 
@@ -118,11 +120,11 @@ examples:
 
     # validate source and targets are different !
     if os.path.abspath(twiki_page_dir) == os.path.abspath(moin_page_dir):
-        msg - "The target directory is the same as the twiki page directory."
+        msg = "The target directory is the same as the twiki page directory."
         log.error(msg)
         log_exit(1)
     if os.path.abspath(twiki_data_dir) == os.path.abspath(moin_page_dir):
-        msg - "The target directory is the same as the twiki data directory."
+        msg = "The target directory is the same as the twiki data directory."
         log.error(msg)
         log_exit(1)
         
