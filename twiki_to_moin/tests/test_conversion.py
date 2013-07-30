@@ -107,7 +107,7 @@ topic info
 class LinkTests(unittest.TestCase):
     "Tests for link conversion"
 
-    # XXX need tests for prefix 
+    # TODO need tests for prefix 
     def test_simple(self):
         twiki = "[[SimpleLink]]"
         moin  = "[[SimpleLink]]"
@@ -151,6 +151,8 @@ class LinkTests(unittest.TestCase):
         self.assertEqual(tm.process_links(twiki, ""), moin)
 
     def test_attachment(self):
+        "tests for attachment links"
+
         # by the time we process links, a bare %ATTACHURL% should have 
         # been converted to [[attachment: ]], so the test for that 
         # case is under VariableTests
@@ -315,7 +317,7 @@ a second line
         moin = "= Heading level 1 ="
         self.assertEqual(tm.process_markup(twiki), moin)
 
-        # XXX check this - is this legal in twiki ?
+        # TODO check this - is this even legal in twiki ?
         twiki = "---# Heading level 1"
         moin = "= Heading level 1 ="
         self.assertEqual(tm.process_markup(twiki), moin)

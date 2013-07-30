@@ -20,14 +20,28 @@ sources, and target MoinMoin 1.8 or 1.9. It might work against Twiki 5.
 The utility should be run under Linux or OS X.  No testing has been
 done under Windows, and the file manipulations will probably not work.
 
+homepage: https://github.com/lhrc-mikeyp/TWiki_To_Moin
+
 *************
 Installation
 *************
 
-pip, easy install, etc
+There are no dependencies other than the Python standard library.
 
-source install
+1. Download the source distribution TWiki_To_Moin-1.0.tar.gz 
+2. ``tar xvf TWiki_To_Moin-1.0.tar.gz`` 
+3. ``python setup.py install``
 
+The source distribution will also install with pip and easy_install.
+
+From source
+===========
+
+The source repository is at https://github.com/lhrc-mikeyp/TWiki_To_Moin
+
+1. ``git clone https://github.com/lhrc-mikeyp/TWiki_To_Moin.git``
+2. ``cd TWiki_To_Moin``
+3. ``python setup.py install``
 
 *******
 Usage
@@ -145,7 +159,7 @@ Beyond these general markup conversion issues, here are some other limitations:
  #. No attempt is made to check for locking or active edits.  It is assumed the source and target wikis are not active.
  #. Embedded images using html <img> markup are not handled.
  #. The list of supported TWiki variables should be expanded.
- #. * as a bullet with * as bold inside a paragraph is not handled. 
+ #. \* as a bullet with * as bold inside a paragraph is not handled. 
  #. TWiki signatures are left in place.
  #. Needs to be upgraded to MoinMoin 2.
  #. needs to be converted to Python 3.
@@ -218,6 +232,6 @@ This code is more or less a complete rewrite of the conversion
 scripts found on http://moinmo.in/TwikiConverter
 
 I believe the original scripts were originally developed by Bill
-Trost, Eirch, Reimar Bauer, and Thomas Waldmann, and perhaps others.
+Trost, Erich ?, Reimar Bauer, Thomas Waldmann, and perhaps others.
 They all deserve credit for working out the general process.
 

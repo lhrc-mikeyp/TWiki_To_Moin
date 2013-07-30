@@ -21,6 +21,5 @@ setup(
     description = "TWiki to Moin Moin conversion utility",
     license = "GNU General Public License v3 or later (GPLv3+)",
     keywords = "moin moinmoin wiki twiki converter",
-    # TODO(mikeyp) update URL for github 
-    url = "http://example.com/HelloWorld/",   # project home page, if any
+    url = "https://github.com/lhrc-mikeyp/TWiki_To_Moin",
 )

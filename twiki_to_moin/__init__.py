@@ -21,7 +21,7 @@ TWiki to MoinMoin conversion
 import logging 
 from optparse import OptionParser
 import os
-from os.path import isdir, join
+from os.path import isdir, join, abspath
 import re
 import sys
 
@@ -93,32 +93,44 @@ examples:
     moin_page_dir = arguments[2]
     prefix = options.prefix
 
-    log.info("TODO: log arguments here")
+    log.info("Running with arguments:")
+    msg = "TWiki page dir: {0) Twiki data dir: {1} Destination dir: {2}".format(
+        twiki_page_dir, twiki_data_dir, moin_page_dir)
+    log.info(msg)
 
     # validate arguments 
     if not os.path.isdir(twiki_page_dir):
         msg = "The TWiki page directory {0} does not exist.".format(
             twiki_page_dir)
         log.error(msg)
-        sys.exit(1)
+        log_exit(1)
     if not os.path.isdir(twiki_data_dir):
         msg = "The TWiki data directory {0} does not exist.".format(
             twiki_data_dir)
         log.error(msg)
-        sys.exit(1)
+        log_exit(1)
     if not os.path.isdir(moin_page_dir):
         msg = "The MoinMoin data directory {0} does not exist.".format(
             moin_page_dir)
         log.info(msg)
         msg = "The MoinMoin data directory will be created if possible." 
         log.info(msg)
-    # TODO(mikeyp) validate source and targets are different !
 
+    # validate source and targets are different !
+    if os.path.abspath(twiki_page_dir) == os.path.abspath(moin_page_dir):
+        msg - "The target directory is the same as the twiki page directory."
+        log.error(msg)
+        log_exit(1)
+    if os.path.abspath(twiki_data_dir) == os.path.abspath(moin_page_dir):
+        msg - "The target directory is the same as the twiki data directory."
+        log.error(msg)
+        log_exit(1)
+        
     convert_directory(twiki_page_dir,twiki_data_dir, moin_page_dir, prefix)
 
-    exit(0)
+    log_exit(0)
 
-def exit(code):
+def log_exit(code):
     if code == 0:
         log.info("Successfully completed conversion run.")
         sys.exit(0)
