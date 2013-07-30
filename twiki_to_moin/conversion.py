@@ -16,8 +16,8 @@
 #
 
 import os
+from os.path import join
 import re
-import shutil
 
 
 def twiki2moin(txt, prefix):
@@ -178,7 +178,10 @@ def convert_link(matchobj, prefix):
         # convert SubWeb links to use / instead of .    
         first = first.replace('.', '/')
         # insert prefix if it's defined 
-        first = '/'.join(prefix + [first])
+        # TODO verify prefix handling here 
+        print prefix, first
+        first = join(prefix, first)
+        # first = '/'.join(prefix + [first])
     link = ''.join([first, pieces[1], pieces[2]])
     # print 'after', link
     return link

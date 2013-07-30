@@ -14,55 +14,150 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+"""
+TWiki to MoinMoin conversion
+
+"""
+import logging 
+from optparse import OptionParser
 import os
-from os.path import isdir
+from os.path import isdir, join
+import re
 import sys
 
-import twiki_to_moin
-#import twiki_to_moin.conversion as conversion
-#import twiki_to_moin.copying as copying 
+__version__ = '1.0'
 
-
-#TODO(mikeyp) fix version for release
-__version__ = '0.3'
+# set up console logging
+log = logging.getLogger('twiki_to_moin')
+log.setLevel(logging.INFO)
+console_handler = logging.StreamHandler()
+log.addHandler(console_handler)
 
 # constants used by Moin when mapping URL's to file names
 moinslash = '(2f)'
 moindash = '(2d)'
 moinspace = '(2d)'
 
-def run():
+def run(args):
+    """"entry point for command line driver
 
-    #TODO(mikeyp) add command line parser/driver 
-    print "run not implemented"
-    return 
+    args is the command line, in the form of sys.argv
+    """
 
-    # main("../awiki/data/Main", "moin-1.3.5/wiki/data/pages", "../awiki/pub/Main")
-    twiki_page_dir = sys.argv[1]
-    moin_page_dir = sys.argv[2]
-    twiki_data_dir = sys.argv[3]
-    prefix = sys.argv[4:]
+    usage_msg = """%prog [options] <twiki_page_dir> <twiki_data_dir> <moin_page_dir>
 
-    main(twiki_page_dir, moin_page_dir, twiki_data_dir, prefix)
+examples:
 
-def main(old_dir, new_dir, data_dir=None, prefix=[]):
-    # print "+++ processing", old_dir, "using prefix", prefix
+    %prog awiki/data/Main awiki/pub/Main moin-1.3.5/wiki/data/pages 
+
+    %prog --help 
+
+    """
+    parser = OptionParser(usage=usage_msg, 
+                          prog=os.path.basename(args[0]))
+
+    parser.add_option("-p", "--prefix", 
+                  action="store", type="string", dest="prefix", default="",
+                  help="not sure; historical and weird ")
+
+    parser.add_option("-l", "--logfile", 
+                  action="store", type="string", dest="logfile", default=None,
+                  help="optional log file ")
+
+    parser.add_option("-v", "--verbose", 
+                  action="count", dest="debug", default=0,
+                  help="log additional detail during conversion")
+
+    (options, arguments) = parser.parse_args(args[1:])
+    if len(arguments) != 3:
+        parser.error("Three arguments are required.")
+        # parser.error() will exit 
+
+    # adjust log level, set up file logging
+    if options.debug == 1:
+        log.setLevel(logging.DEBUG)
+        msg = "Enabled verbose logging."
+        log.debug(msg)   
+    if options.logfile:    
+        fh = logging.FileHandler(options.logfile)
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        log.addHandler(fh)
+        msg = "Enabled logging to file: " + options.logfile
+        log.info(msg)
+
+    log.info("Beginning conversion run")
+
+    twiki_page_dir = arguments[0]
+    twiki_data_dir = arguments[1]
+    moin_page_dir = arguments[2]
+    prefix = options.prefix
+
+    log.info("TODO: log arguments here")
+
+    # validate arguments 
+    if not os.path.isdir(twiki_page_dir):
+        msg = "The TWiki page directory {0} does not exist.".format(
+            twiki_page_dir)
+        log.error(msg)
+        sys.exit(1)
+    if not os.path.isdir(twiki_data_dir):
+        msg = "The TWiki data directory {0} does not exist.".format(
+            twiki_data_dir)
+        log.error(msg)
+        sys.exit(1)
+    if not os.path.isdir(moin_page_dir):
+        msg = "The MoinMoin data directory {0} does not exist.".format(
+            moin_page_dir)
+        log.info(msg)
+        msg = "The MoinMoin data directory will be created if possible." 
+        log.info(msg)
+    # TODO(mikeyp) validate source and targets are different !
+
+    convert_directory(twiki_page_dir,twiki_data_dir, moin_page_dir, prefix)
+
+    exit(0)
+
+def exit(code):
+    if code == 0:
+        log.info("Successfully completed conversion run.")
+        sys.exit(0)
+    else:
+        log.info("Conversion completed with errors.")
+        sys.exit(code)
+        
+def convert_directory(old_dir, data_dir, new_dir, prefix=''):
+    """Convert a directory of TWiki data to MoinMoin
+
+    recursively calls itself to handle the TWiki directory structure
+
+    """
+    from twiki_to_moin.conversion import twiki2moin
+    from twiki_to_moin.copying import make_page, copy_attachments
+
+    msg = "Processing TWiki directory {0} using prefix {1}".format(
+        old_dir, prefix)
+    log.info(msg)
+    # TODO - this really should use os.walk()
     names = os.listdir(old_dir)
     for name in names:
         if name[-4:] == ".txt":
-             # fixup moin page names
-            topic = moinslash.join(prefix + [name[:-4]])
+             # convert filename from TWiki to moin format
+            topic = name[:-4]
+            if prefix:
+                topic = join(prefix, topic)
+            topic = re.compile(r"/").sub(moinslash, topic)
             topic = re.compile(r"-").sub(moindash, topic)
             topic = re.compile(r" ").sub(moinspace, topic)
-            print topic
+            msg = "Converting TWiki page {0} to Moin topic {1}".format(
+                name, topic)
+            log.info(msg)
 
             txt = file(os.path.join(old_dir, name)).read()
-            twiki_to_moin.copying.make_page(new_dir, topic, twiki_to_moin.conversion.twiki2moin(txt, prefix))
+            new_txt = twiki2moin(txt, prefix)
+            make_page( new_dir, topic, new_txt) 
             if data_dir:
-                twiki_to_moin.copying.copy_attachments(new_dir, data_dir, name[:-4], topic, txt)
-	else:
-            path = old_dir + '/' + name
-            if isdir(path):
-                main(path, new_dir, data_dir + "/" + name, prefix + [name])
-
-
+                copy_attachments( new_dir, data_dir, name[:-4], topic, txt)
+        elif isdir(join(old_dir, name)):
+                convert_directory(join(old_dir, name), 
+                    new_dir, join(data_dir, name), join(prefix, name))

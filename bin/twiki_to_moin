@@ -16,7 +16,9 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import sys
+
 import twiki_to_moin
 
-twiki_to_moin.run()
+twiki_to_moin.run(sys.argv)
 

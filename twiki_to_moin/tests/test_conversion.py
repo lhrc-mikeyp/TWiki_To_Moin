@@ -111,44 +111,44 @@ class LinkTests(unittest.TestCase):
     def test_simple(self):
         twiki = "[[SimpleLink]]"
         moin  = "[[SimpleLink]]"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
     def test_lowercase(self):
         twiki = "[[simplelink]]"
         moin  = "[[Simplelink]]"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
     def test_simple_spaces(self):
         twiki = "[[Simple Link]]"
         moin  = "[[SimpleLink|Simple Link]]"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
     def test_wikiword(self):
         twiki = "SimpleLink"
         moin  = "SimpleLink"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
     def test_specific(self):
         twiki = "[[SimpleLink][A Friendly name]]"
         moin = "[[SimpleLink|A Friendly name]]"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
     def test_http(self):
         twiki = "[[http://www.example.com]]"
         moin = "[[http://www.example.com]]"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
         twiki = "[[http://www.example.com][Example.com]]"
         moin = "[[http://www.example.com|Example.com]]"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
         twiki = "[[https://www.example.com]]"
         moin = "[[https://www.example.com]]"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
         twiki = "[[https://www.example.com][Example.com]]"
         moin = "[[https://www.example.com|Example.com]]"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
     def test_attachment(self):
         # by the time we process links, a bare %ATTACHURL% should have 
@@ -157,11 +157,11 @@ class LinkTests(unittest.TestCase):
 
         twiki = "[[attachment:something.jpg][Picture]]"
         moin = "[[attachment:something.jpg|Picture]]"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
         twiki = "[[attachment:something.jpg]]"
         moin = "[[attachment:something.jpg]]"
-        self.assertEqual(tm.process_links(twiki, []), moin)
+        self.assertEqual(tm.process_links(twiki, ""), moin)
 
 
 class MarkupTests(unittest.TestCase):
