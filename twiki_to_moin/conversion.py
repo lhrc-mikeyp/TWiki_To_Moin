@@ -15,8 +15,6 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-from os.path import join
 import re
 
 
@@ -147,10 +145,15 @@ def process_links(txt, prefix):
     # preprocess raw attachments into links
     txt = re.sub(r'[^\[][0,2](attachment:.*)[^\]][0,2]', 
                  '[[' + "\\1" + ']]', txt)
-    # everything else
+    # handle explicit links inside brackets [[link]]
     txt = re.sub(r'\[\[(.*?)\]\]', 
           lambda matchobj: '[[' + convert_link(matchobj, prefix) + ']]',
           txt)
+    # handle prefix for WikiWords here 
+    if prefix:
+        wikiword_re = re.compile(r'(\s)([A-Z]\w+[A-Z]+\w+)')
+        txt = wikiword_re.sub(r'\1' + prefix + '/' + r'\2', txt)
+
     return txt
 
 def convert_link(matchobj, prefix):
@@ -178,10 +181,8 @@ def convert_link(matchobj, prefix):
         # convert SubWeb links to use / instead of .    
         first = first.replace('.', '/')
         # insert prefix if it's defined 
-        # TODO verify prefix handling here 
-        print prefix, first
-        first = join(prefix, first)
-        # first = '/'.join(prefix + [first])
+        if prefix:
+            first = '/'.join([prefix, first])
     link = ''.join([first, pieces[1], pieces[2]])
     # print 'after', link
     return link

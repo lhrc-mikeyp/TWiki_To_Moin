@@ -115,19 +115,23 @@ TWiki markup supported
 HTML markup supported
 =====================
 
- - <br>
- - <em>
- - <strong>
- - &lt; &gt; &amp;
- - <p>   
- - <pre>
+- <br>
+- <em>
+- <strong>
+- &lt; &gt; &amp;
+- <p>   
+- <pre>
 
 Unrecognized html markup is passed through untouched.
 
-SubWikis
-========
+SubWiki Support
+===============
 
-TODO add comments re: handling link fixups with prefix in place 
+When processing wikis using the --prefix option, links in the source
+wiki are fixed to refer to the correct MoinMoin path in the destination
+wiki.  Explicit SubWiki links of the form wiki.topic are also
+converted.
+
 
 **********************
 Limitations and Issues
@@ -143,26 +147,29 @@ best way to catch these issues is to look at the converted wiki,
 since unusual markup is left untouched. If you see a common pattern,
 log an issue or submit a patch.
 
-Beyond these general markup conversion issues, here are some other limitations:
+Beyond these general markup conversion issues, here are some other
+limitations:
 
- 1. Doesn't convert history and versions; only the current TWiki data is 
-    converted.
- #. twiki_to_moin only runs under Linux and OS X.
- #. There is minimal awareness of code pages; the results are UTF-8 encoded, 
-    reads assume latin1 code page.
- #. TWiki metadata lines are just stripped from the output.
- #. TWiki allows links embedded in headers, MoinMoin doesn't support this.  
-    In these cases, the converted wiki will just have the MoinMoin link 
-    syntax in the header. 
- #. empty headers (e.g. ---+<nl> ) cause problems
- #. embedded html <a> links are not converted.
- #. No attempt is made to check for locking or active edits.  It is assumed the source and target wikis are not active.
- #. Embedded images using html <img> markup are not handled.
- #. The list of supported TWiki variables should be expanded.
- #. \* as a bullet with * as bold inside a paragraph is not handled. 
- #. TWiki signatures are left in place.
- #. Needs to be upgraded to MoinMoin 2.
- #. needs to be converted to Python 3.
+1. Doesn't convert history and versions; only the current TWiki data is 
+   converted.
+#. twiki_to_moin only runs under Linux and OS X.
+#. There is minimal awareness of code pages; the results are UTF-8 encoded, 
+   reads assume latin1 code page.
+#. TWiki metadata lines are just stripped from the output.
+#. TWiki allows links embedded in headers, MoinMoin doesn't support this.  
+   In these cases, the converted wiki will just have the MoinMoin link 
+   syntax in the header.
+#. empty headers (e.g. ---+<nl> ) cause problems.
+#. embedded html <a> links are not converted.
+#. No attempt is made to check for locking or active edits.  It is 
+   assumed the source and target wikis are not active.
+#. Embedded images using html <img> markup are not handled.
+#. The list of supported TWiki variables should be expanded.
+#. \* as a bullet with * as bold inside a paragraph is not handled. 
+#. TWiki signatures are left in place.
+#. Needs to be upgraded to MoinMoin 2.
+#. Needs to be converted to Python 3.
+#. There are never enough tests.
 
 *************
 Hacking
@@ -173,10 +180,10 @@ Some guidelines if you would like to hack on the code.
 Workflow
 ========
 
- 1. The git trunk is current and should always be working.
- #. Development work happens in branches, and is merged to trunk when complete.
- #. Pull requests are welcome, against trunk or a branch.
- #. New code, expecially conversions, should include unit tests.
+1. The git trunk is current and should always be working.
+#. Development work happens in branches, and is merged to trunk when complete.
+#. Pull requests are welcome, against trunk or a branch.
+#. New code, expecially conversions, should include unit tests.
 
 Code and Logic
 ==============
@@ -201,24 +208,24 @@ passes use regular expressions to perform the substitution.
 
 The conversion has been broken into several pieces:
 
- - variables
- - metadata
- - links
- - markup
- - tables
- - html conversions
+- variables
+- metadata
+- links
+- markup
+- tables
+- html conversions
     
 There are a few things to be aware of when modifying the conversion logic:
 
- 1. The order of operations matters.
- 2. During conversion, txt contains _mixed_ TWiki and Moin markup. 
- 3. Use very specific regular expressions to avoid side-effects.
+1. The order of operations matters.
+2. During conversion, txt contains _mixed_ TWiki and Moin markup. 
+3. Use very specific regular expressions to avoid side-effects.
 
 To modify the conversion logic, the easiest approach is to write a
 unit test with the original and expected results, and use that to
 develop the conversion logic.
 
-```python setup.py test``` will run the unit tests.
+``python setup.py test`` will run the unit tests.
 
 If you're stuck, submit a pull request with just the unit test.
 

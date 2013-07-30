@@ -107,48 +107,57 @@ topic info
 class LinkTests(unittest.TestCase):
     "Tests for link conversion"
 
-    # TODO need tests for prefix 
+    # prefix is null here.  This LinkTests class is also
+    # subclassed as LinkTestsPrefix, and re-run with a 
+    # prefix set
+
+    def setUp(self):
+        self.prefix = ""
+        self.prefix_slash = ""
+
     def test_simple(self):
         twiki = "[[SimpleLink]]"
-        moin  = "[[SimpleLink]]"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        moin  = "[[" + self.prefix_slash + "SimpleLink]]"
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
     def test_lowercase(self):
         twiki = "[[simplelink]]"
-        moin  = "[[Simplelink]]"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        moin  = "[[" + self.prefix_slash + "Simplelink]]"
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
     def test_simple_spaces(self):
         twiki = "[[Simple Link]]"
-        moin  = "[[SimpleLink|Simple Link]]"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        moin  = "[[" + self.prefix_slash + "SimpleLink|Simple Link]]"
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
     def test_wikiword(self):
-        twiki = "SimpleLink"
-        moin  = "SimpleLink"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        # spaces around the wikiwords here are deliberate, since
+        # wikiwords are defined by whitespace
+        twiki = " SimpleLink "
+        moin  = " " + self.prefix_slash + "SimpleLink "
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
     def test_specific(self):
         twiki = "[[SimpleLink][A Friendly name]]"
-        moin = "[[SimpleLink|A Friendly name]]"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        moin = "[[" + self.prefix_slash + "SimpleLink|A Friendly name]]"
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
     def test_http(self):
         twiki = "[[http://www.example.com]]"
         moin = "[[http://www.example.com]]"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
         twiki = "[[http://www.example.com][Example.com]]"
         moin = "[[http://www.example.com|Example.com]]"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
         twiki = "[[https://www.example.com]]"
         moin = "[[https://www.example.com]]"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
         twiki = "[[https://www.example.com][Example.com]]"
         moin = "[[https://www.example.com|Example.com]]"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
     def test_attachment(self):
         "tests for attachment links"
@@ -159,11 +168,21 @@ class LinkTests(unittest.TestCase):
 
         twiki = "[[attachment:something.jpg][Picture]]"
         moin = "[[attachment:something.jpg|Picture]]"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
 
         twiki = "[[attachment:something.jpg]]"
         moin = "[[attachment:something.jpg]]"
-        self.assertEqual(tm.process_links(twiki, ""), moin)
+        self.assertEqual(tm.process_links(twiki, self.prefix), moin)
+
+
+class LinkTestsPrefix(LinkTests):
+    "Tests for link conversion with prefix"
+
+    # we run the parent TestCase class again, with a different 
+    # prefix 
+    def setUp(self):
+        self.prefix = "Parent"
+        self.prefix_slash = "Parent/"
 
 
 class MarkupTests(unittest.TestCase):
@@ -439,6 +458,7 @@ def suite():
         VariableTests,
         MetaTests,
         LinkTests,
+        LinkTestsPrefix,
         MarkupTests,
         TableTests,
         HTMLTests,
