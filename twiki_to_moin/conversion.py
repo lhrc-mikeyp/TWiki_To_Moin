@@ -90,7 +90,9 @@ def process_markup(txt):
     txt = re.compile("   \$ (.*): (.*)").sub("\\1:: \\2", txt)
 
     # numbered lists
-    txt = re.compile("(   )+[0-9] ").sub("\\1 1. ", txt)
+    txt = re.compile("((   )+)[0-9]\. ").sub("\\1 1. ", txt)
+    # TWiki accepts numbered list without the . 
+    txt = re.compile("((   )+)[0-9] ").sub("\\1 1. ", txt)
 
     # convert headings
     txt = re.compile("^-?" + re.escape("---++++++") + "\s*(.*)$", re.M).sub("====== \\1 ======", txt)
@@ -133,6 +135,7 @@ def process_variables(txt):
         (r"%VBAR%", r"|"),
         (r"%CARET%", r"^"),
         (r"%ATTACHURL%/(\S*)", "[[attachment:\\2]]"),
+        (r"%ATTACHURLPATH%/(\S*)", "[[attachment:\\2]]"),
     ]
 
     for mapping in twiki_moin_variables:	
@@ -156,7 +159,7 @@ def process_links(txt, prefix):
     # we convert to an explicit link when a prefix is involved, so
     # the link resolves to the correct place in the sub wiki
     if prefix:
-        wikiword_re = re.compile(r'(\s)([A-Z][a-z]+[A-Z]+[a-z]+)')
+        wikiword_re = re.compile(r'(\s)([A-Z][a-z]+[A-Z]+[a-zA-Z]+)')
         txt = wikiword_re.sub(r'\1[[' + prefix + '/' + r'\2]]', txt)
     return txt
 
